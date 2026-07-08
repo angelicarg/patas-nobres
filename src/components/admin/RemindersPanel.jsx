@@ -53,9 +53,26 @@ export default function RemindersPanel() {
     return reminders.find((r) => r.pet_id === petId && r.type === type && r.due_date === dueDate);
   }
 
+  function reminderMessage(item) {
+    const tutorName = item.pet.pn_clients?.name?.split(" ")[0] || "tutor(a)";
+    const when = formatDate(item.dueDate);
+    if (item.type === "vaccine") {
+      return `Olá ${tutorName}! 🐾 Passando pra lembrar que a vacina do(a) ${item.pet.name} está prevista para ${when}. Não esqueça de agendar a visita ao veterinário!`;
+    }
+    return `Olá ${tutorName}! 🐾 Passando pra lembrar que o(a) ${item.pet.name} tem banho/tosa previsto para ${when}. Quer aproveitar e já agendar com a gente?`;
+  }
+
+  function openWhatsApp(item) {
+    const digits = (item.pet.pn_clients?.phone || "").replace(/\D/g, "");
+    const phone = digits.startsWith("55") ? digits : `55${digits}`;
+    const text = encodeURIComponent(reminderMessage(item));
+    window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+  }
+
   async function markSent(item) {
     const key = `${item.pet.id}-${item.type}-${item.dueDate}`;
     setSendingKey(key);
+    openWhatsApp(item);
     const existing = findReminder(item.pet.id, item.type, item.dueDate);
     if (existing) {
       await supabase.from("pn_reminders").update({ status: "sent_simulated", sent_at: new Date().toISOString() }).eq("id", existing.id);
@@ -70,8 +87,8 @@ export default function RemindersPanel() {
     <div>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: "#2F5233", marginBottom: 6 }}>Lembretes</h1>
       <p style={{ fontSize: 13, color: "#7A8B7D", marginBottom: 24 }}>
-        Pets com banho/tosa ou vacina previstos para os próximos 7 dias. O envio por WhatsApp é simulado nesta demo —
-        marque como enviado para registrar o contato.
+        Pets com banho/tosa ou vacina previstos para os próximos 7 dias. O botão abre o WhatsApp com a mensagem já
+        escrita para o tutor — é só clicar em enviar por lá — e registra o contato aqui no painel.
       </p>
 
       {loading ? (
@@ -93,14 +110,19 @@ export default function RemindersPanel() {
                   </div>
                 </div>
                 {sent ? (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#2F5233", background: "#2F523315", borderRadius: 100, padding: "6px 14px" }}>✅ Enviado (simulado)</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#2F5233", background: "#2F523315", borderRadius: 100, padding: "6px 14px" }}>✅ Contato registrado</span>
+                    <button onClick={() => openWhatsApp(item)} style={{ background: "none", border: "1px solid #DCE5D6", borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600, color: "#2F5233", cursor: "pointer" }}>
+                      Abrir de novo
+                    </button>
+                  </div>
                 ) : (
                   <button
                     disabled={sendingKey === key}
                     onClick={() => markSent(item)}
                     style={{ background: "#25D366", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: sendingKey === key ? 0.6 : 1 }}
                   >
-                    💬 Marcar como enviado (simulado)
+                    💬 Abrir WhatsApp e marcar como enviado
                   </button>
                 )}
               </div>

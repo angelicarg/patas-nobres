@@ -8,6 +8,8 @@ function formatDate(dateStr) {
   return `${d} ${months[parseInt(m, 10) - 1]}`;
 }
 
+const EMPTY_PET_FORM = { name: "", species: "Cachorro", breed: "", next_grooming_due: "", next_vaccine_due: "", restrictions: "", vaccination_notes: "" };
+
 export default function ClientsDirectory() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +17,9 @@ export default function ClientsDirectory() {
   const [expandedId, setExpandedId] = useState(null);
   const [detail, setDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [editingPetId, setEditingPetId] = useState(null);
+  const [petForm, setPetForm] = useState(EMPTY_PET_FORM);
+  const [savingPet, setSavingPet] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -46,6 +51,42 @@ export default function ClientsDirectory() {
     ]);
     setDetail({ pets: pets || [], appointments: appointments || [], orders: orders || [] });
     setLoadingDetail(false);
+  }
+
+  function startEditPet(p) {
+    setEditingPetId(p.id);
+    setPetForm({
+      name: p.name,
+      species: p.species || "Cachorro",
+      breed: p.breed || "",
+      next_grooming_due: p.next_grooming_due || "",
+      next_vaccine_due: p.next_vaccine_due || "",
+      restrictions: p.restrictions || "",
+      vaccination_notes: p.vaccination_notes || "",
+    });
+  }
+
+  function cancelEditPet() {
+    setEditingPetId(null);
+    setPetForm(EMPTY_PET_FORM);
+  }
+
+  async function savePet() {
+    setSavingPet(true);
+    const payload = {
+      name: petForm.name.trim(),
+      species: petForm.species,
+      breed: petForm.breed.trim() || null,
+      next_grooming_due: petForm.next_grooming_due || null,
+      next_vaccine_due: petForm.next_vaccine_due || null,
+      restrictions: petForm.restrictions.trim() || null,
+      vaccination_notes: petForm.vaccination_notes.trim() || null,
+    };
+    await supabase.from("pn_pets").update(payload).eq("id", editingPetId);
+    const { data: pets } = await supabase.from("pn_pets").select("*").eq("client_id", expandedId).order("name");
+    setDetail((prev) => ({ ...prev, pets: pets || [] }));
+    setSavingPet(false);
+    cancelEditPet();
   }
 
   return (
@@ -88,13 +129,53 @@ export default function ClientsDirectory() {
                         {detail.pets.length === 0 ? (
                           <p style={emptyText}>Nenhum pet cadastrado ainda.</p>
                         ) : (
-                          detail.pets.map((p) => (
-                            <div key={p.id} style={detailRow}>
-                              <strong>{p.name}</strong> · {p.species}{p.breed ? ` · ${p.breed}` : ""}
-                              {p.restrictions && <div style={{ fontSize: 12, color: "#C0392B", marginTop: 2 }}>⚠️ {p.restrictions}</div>}
-                              {p.vaccination_notes && <div style={{ fontSize: 12, color: "#7A8B7D", marginTop: 2 }}>💉 {p.vaccination_notes}</div>}
-                            </div>
-                          ))
+                          detail.pets.map((p) =>
+                            editingPetId === p.id ? (
+                              <div key={p.id} style={petFormBox}>
+                                <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                                  <input placeholder="Nome do pet" value={petForm.name} onChange={(e) => setPetForm({ ...petForm, name: e.target.value })} style={petInput} />
+                                  <select value={petForm.species} onChange={(e) => setPetForm({ ...petForm, species: e.target.value })} style={petInput}>
+                                    <option>Cachorro</option>
+                                    <option>Gato</option>
+                                    <option>Outro</option>
+                                  </select>
+                                  <input placeholder="Raça" value={petForm.breed} onChange={(e) => setPetForm({ ...petForm, breed: e.target.value })} style={petInput} />
+                                </div>
+                                <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                                  <div style={{ flex: "1 1 160px" }}>
+                                    <label style={petLabel}>Próximo banho/tosa</label>
+                                    <input type="date" value={petForm.next_grooming_due} onChange={(e) => setPetForm({ ...petForm, next_grooming_due: e.target.value })} style={petInput} />
+                                  </div>
+                                  <div style={{ flex: "1 1 160px" }}>
+                                    <label style={petLabel}>Próxima vacina</label>
+                                    <input type="date" value={petForm.next_vaccine_due} onChange={(e) => setPetForm({ ...petForm, next_vaccine_due: e.target.value })} style={petInput} />
+                                  </div>
+                                </div>
+                                <input placeholder="Restrições (alergias, comportamento...)" value={petForm.restrictions} onChange={(e) => setPetForm({ ...petForm, restrictions: e.target.value })} style={{ ...petInput, width: "100%", marginBottom: 8, boxSizing: "border-box" }} />
+                                <input placeholder="Notas de vacinação" value={petForm.vaccination_notes} onChange={(e) => setPetForm({ ...petForm, vaccination_notes: e.target.value })} style={{ ...petInput, width: "100%", marginBottom: 10, boxSizing: "border-box" }} />
+                                <div style={{ display: "flex", gap: 8 }}>
+                                  <button onClick={savePet} disabled={savingPet || !petForm.name} style={petSaveBtn}>{savingPet ? "Salvando..." : "Salvar"}</button>
+                                  <button onClick={cancelEditPet} style={petCancelBtn}>Cancelar</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div key={p.id} style={detailRow}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                                  <div>
+                                    <strong>{p.name}</strong> · {p.species}{p.breed ? ` · ${p.breed}` : ""}
+                                    {p.restrictions && <div style={{ fontSize: 12, color: "#C0392B", marginTop: 2 }}>⚠️ {p.restrictions}</div>}
+                                    {p.vaccination_notes && <div style={{ fontSize: 12, color: "#7A8B7D", marginTop: 2 }}>💉 {p.vaccination_notes}</div>}
+                                    <div style={{ fontSize: 12, color: "#7A8B7D", marginTop: 2 }}>
+                                      🛁 Próximo banho: {p.next_grooming_due ? formatDate(p.next_grooming_due) : "não definido"} · 💉 Próxima vacina: {p.next_vaccine_due ? formatDate(p.next_vaccine_due) : "não definida"}
+                                    </div>
+                                  </div>
+                                  <button onClick={() => startEditPet(p)} style={{ background: "none", border: "none", fontSize: 12, color: "#2F5233", cursor: "pointer", fontWeight: 700, whiteSpace: "nowrap" }}>
+                                    ✏️ Editar
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          )
                         )}
                       </DetailSection>
 
@@ -144,3 +225,8 @@ function DetailSection({ title, children, last }) {
 
 const detailRow = { fontSize: 13, color: "#2F5233", padding: "6px 10px", background: "#F6F1E7", borderRadius: 8, marginBottom: 6 };
 const emptyText = { fontSize: 12, color: "#7A8B7D", margin: 0 };
+const petFormBox = { background: "#F6F1E7", border: "1px solid #DCE5D6", borderRadius: 10, padding: 12, marginBottom: 6 };
+const petInput = { flex: "1 1 120px", padding: "7px 10px", borderRadius: 8, border: "1.5px solid #DCE5D6", fontSize: 12, outline: "none", fontFamily: "inherit", background: "#fff" };
+const petLabel = { display: "block", fontSize: 11, fontWeight: 600, color: "#4A5B45", marginBottom: 3 };
+const petSaveBtn = { background: "#2F5233", color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer" };
+const petCancelBtn = { background: "#fff", color: "#4A5B45", border: "1px solid #DCE5D6", borderRadius: 8, padding: "7px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer" };
