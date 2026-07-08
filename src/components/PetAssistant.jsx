@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PRIMARY, ACCENT, TEXT_MUTED, BORDER, BG_PAGE } from "./BookingModal";
+import PawMark from "./PawMark";
 
 const QUICK = ["Recomendação de ração 🍖", "Brinquedo para gato 🧸", "Petiscos naturais 🥩", "Produtos para pelo longo ✂️"];
 
@@ -78,7 +79,7 @@ export default function PetAssistant() {
         }}
         title="Falar com a assistente"
       >
-        {open ? "✕" : "🐾"}
+        {open ? "✕" : <PawMark size={28} />}
         {!open && unread > 0 && (
           <span style={{ position: "absolute", top: -4, right: -4, background: ACCENT, color: "#fff", borderRadius: "50%", width: 20, height: 20, fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
             {unread}
@@ -89,7 +90,7 @@ export default function PetAssistant() {
       {open && (
         <div style={{ position: "fixed", bottom: 100, right: 28, zIndex: 499, width: "min(380px, calc(100vw - 32px))", background: BG_PAGE, borderRadius: 20, boxShadow: `0 20px 60px ${PRIMARY}40`, border: `1px solid ${BORDER}`, display: "flex", flexDirection: "column", maxHeight: "75vh" }}>
           <div style={{ background: `linear-gradient(135deg, ${PRIMARY}, #1F3A24)`, borderRadius: "20px 20px 0 0", padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(201,123,74,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🐾</div>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(201,123,74,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><PawMark size={24} /></div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 14, color: "#fff" }}>Assistente Patas Nobres</div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)" }}>Recomendações personalizadas</div>
@@ -121,7 +122,7 @@ export default function PetAssistant() {
             {messages.map((m, i) => (
               <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
                 {m.role === "assistant" && (
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: `${PRIMARY}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, marginRight: 8, flexShrink: 0, alignSelf: "flex-end" }}>🐾</div>
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: `${PRIMARY}22`, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 8, flexShrink: 0, alignSelf: "flex-end" }}><PawMark size={16} /></div>
                 )}
                 <div style={{
                   maxWidth: "78%",

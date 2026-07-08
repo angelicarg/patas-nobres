@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { PRIMARY, TEXT_MUTED, BORDER, BG_PAGE } from "../components/BookingModal";
+import PawMark from "../components/PawMark";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -33,8 +34,8 @@ export default function AdminLogin() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: `linear-gradient(160deg, #1F3A24 0%, ${PRIMARY} 50%, #4A7A52 100%)`, fontFamily: "'Inter', sans-serif", padding: 24 }}>
       <form onSubmit={handleSubmit} style={{ background: "#fff", borderRadius: 20, padding: "40px 32px", width: "100%", maxWidth: 380, boxShadow: "0 24px 60px rgba(31,58,36,0.35)" }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ width: 48, height: 48, margin: "0 auto 14px", background: `linear-gradient(135deg, ${PRIMARY}, #1F3A24)`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
-            🐾
+          <div style={{ width: 48, height: 48, margin: "0 auto 14px", background: `linear-gradient(135deg, ${PRIMARY}, #1F3A24)`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <PawMark size={28} />
           </div>
           <h1 style={{ fontSize: 18, fontWeight: 700, color: PRIMARY }}>Área da equipe</h1>
           <p style={{ fontSize: 13, color: TEXT_MUTED, marginTop: 4 }}>Patas Nobres — acesso restrito</p>

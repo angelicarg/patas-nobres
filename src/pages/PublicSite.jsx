@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 import { BookingModal, ProAvatar, PRIMARY, ACCENT, TEXT_MUTED, BORDER, BG_PAGE, BG_CARD } from "../components/BookingModal";
 import PetAssistant from "../components/PetAssistant";
+import PawMark from "../components/PawMark";
+import heroImage from "../assets/fofinho-3.jpg";
+import servicesImage from "../assets/fofinho-1.jpg";
 
 const PRODUCT_CATEGORIES = ["Ração", "Petiscos", "Acessórios", "Brinquedos", "Higiene"];
 
@@ -132,10 +135,17 @@ export default function PublicSite() {
       <Hero onBook={() => openBooking(null)} />
 
       <Section id="servicos" title="🛁 Serviços" subtitle="Banho, tosa e cuidado completo, com agendamento em poucos cliques">
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <img
+            src={servicesImage}
+            alt="Cachorro e gato aconchegados, recém-banhados"
+            style={{ flex: "1 1 220px", maxWidth: 260, height: 260, objectFit: "cover", borderRadius: 18, boxShadow: "0 12px 30px rgba(31,58,36,0.18)" }}
+          />
+          <div style={{ flex: "3 1 480px", minWidth: 260 }}>
         {loading ? (
           <p style={{ color: TEXT_MUTED }}>Carregando serviços...</p>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 18 }}>
             {services.map((s) => (
               <div key={s.id} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "20px 18px", display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontSize: 15, fontWeight: 700, color: PRIMARY, margin: "0 0 6px" }}>{s.name}</h3>
@@ -148,6 +158,8 @@ export default function PublicSite() {
             ))}
           </div>
         )}
+          </div>
+        </div>
       </Section>
 
       {professionals.length > 0 && (
@@ -230,7 +242,7 @@ function Header({ onBook, cartCount, onCartClick }) {
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 100, background: BG_PAGE, borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 28px" }}>
       <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-        <div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg, ${PRIMARY}, #1F3A24)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🐾</div>
+        <div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg, ${PRIMARY}, #1F3A24)`, display: "flex", alignItems: "center", justifyContent: "center" }}><PawMark size={22} /></div>
         <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 19, color: PRIMARY }}>Patas Nobres</span>
       </a>
 
@@ -374,15 +386,33 @@ const navLink = { color: TEXT_MUTED, textDecoration: "none", fontSize: 14, fontW
 
 function Hero({ onBook }) {
   return (
-    <section style={{ background: `linear-gradient(160deg, #1F3A24 0%, ${PRIMARY} 100%)`, color: "#fff", padding: "72px 28px", textAlign: "center" }}>
-      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+    <section
+      style={{
+        position: "relative",
+        backgroundImage: `url(${heroImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center 35%",
+        color: "#fff",
+        padding: "96px 28px",
+        textAlign: "center",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `linear-gradient(160deg, rgba(31,58,36,0.72) 0%, rgba(47,82,51,0.5) 55%, rgba(31,58,36,0.68) 100%)`,
+        }}
+      />
+      <div style={{ position: "relative", maxWidth: 640, margin: "0 auto" }}>
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: ACCENT }}>
           🐾 Banho, tosa e loja para o seu pet
         </span>
-        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 40, margin: "14px 0", lineHeight: 1.2 }}>
+        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 40, margin: "14px 0", lineHeight: 1.2, textShadow: "0 2px 16px rgba(0,0,0,0.45)" }}>
           Cuidado de verdade para quem é da família
         </h1>
-        <p style={{ fontSize: 16, color: "rgba(255,255,255,0.85)", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 16, color: "rgba(255,255,255,0.92)", lineHeight: 1.6, textShadow: "0 1px 10px rgba(0,0,0,0.4)" }}>
           Agende banho e tosa online, encontre tudo para o seu pet na nossa loja e receba lembretes de cuidado —
           tudo em um só lugar.
         </p>
