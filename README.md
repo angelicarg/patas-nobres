@@ -38,3 +38,4 @@ Rode `supabase/schema.sql` uma vez no SQL Editor do Supabase (Project → SQL Ed
 ## Lembretes por WhatsApp
 
 Os lembretes de banho/tosa e vacina são **simulados** no painel administrativo (aba Lembretes) — não há integração real com Twilio/WhatsApp Business API nesta demo.
+# patas-nobres
