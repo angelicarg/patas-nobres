@@ -135,17 +135,17 @@ export default function PublicSite() {
       <Hero onBook={() => openBooking(null)} />
 
       <Section id="servicos" title="🛁 Serviços" subtitle="Banho, tosa e cuidado completo, com agendamento em poucos cliques">
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "stretch" }}>
           <img
             src={servicesImage}
             alt="Cachorro e gato aconchegados, recém-banhados"
-            style={{ flex: "1 1 220px", maxWidth: 260, height: 260, objectFit: "cover", borderRadius: 18, boxShadow: "0 12px 30px rgba(31,58,36,0.18)" }}
+            style={{ flex: "1 1 260px", minHeight: 260, objectFit: "cover", borderRadius: 18, boxShadow: "0 12px 30px rgba(31,58,36,0.18)" }}
           />
-          <div style={{ flex: "3 1 480px", minWidth: 260 }}>
+          <div style={{ flex: "1.4 1 420px", minWidth: 260 }}>
         {loading ? (
           <p style={{ color: TEXT_MUTED }}>Carregando serviços...</p>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
             {services.map((s) => (
               <div key={s.id} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 16, padding: "20px 18px", display: "flex", flexDirection: "column" }}>
                 <h3 style={{ fontSize: 15, fontWeight: 700, color: PRIMARY, margin: "0 0 6px" }}>{s.name}</h3>
